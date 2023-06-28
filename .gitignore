@@ -1,0 +1,11 @@
+*.pyc
+*.png
+*.pt
+*.log
+*.zip
+*.gz
+/data/
+/dl_ch6/data/
+.code/
+.idea/
+
