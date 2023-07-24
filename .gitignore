@@ -6,6 +6,8 @@
 *.gz
 /data/
 /dl_ch6/data/
+/dl_ch13/data/
 .code/
+.vscode/
 .idea/
 

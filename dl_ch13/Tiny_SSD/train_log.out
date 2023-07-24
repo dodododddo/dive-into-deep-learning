@@ -1,0 +1,5 @@
+###########################################################
+train_class_error 1.25e-03, train_bbox_mae 1.26e-03
+test_class_error 1.82e-03, test_bbox_mae 1.51e-03
+4167.9 examples/sec on cuda
+

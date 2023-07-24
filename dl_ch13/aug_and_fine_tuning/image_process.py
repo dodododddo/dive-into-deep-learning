@@ -3,7 +3,7 @@ import torchvision
 from d2l import torch as d2l
 
 def load_cifar_10(is_train, augs, batch_size):
-    dataset = torchvision.datasets.CIFAR10(root='../data', train=is_train, transform=augs, download=True)
+    dataset = torchvision.datasets.CIFAR10(root='/home/jr/dl/data', train=is_train, transform=augs, download=True)
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size,
                     shuffle=is_train, num_workers=d2l.get_dataloader_workers())
     return dataloader
