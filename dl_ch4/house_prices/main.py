@@ -25,7 +25,7 @@ train_labels = train_labels.to(device)
 
 k = 5
 batch_size = 64
-lr = 0.01
+lr = 0.001
 wd = 0.00001
 num_epochs = 2000
 

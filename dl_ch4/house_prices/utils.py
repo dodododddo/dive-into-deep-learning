@@ -5,6 +5,7 @@ from torch import nn
 import numpy as np
 import pandas as pd
 from download import *
+from torch.nn import functional as F
 
 DATA_HUB['kaggle_house_train'] = (  
     DATA_URL + 'kaggle_house_pred_train.csv',
@@ -18,25 +19,21 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 class MLP(nn.Module):
-    def __init__(self, num_inputs, num_outputs, num_hiddens1, num_hiddens2, is_training=True, dropout1 = 0.2, dropout2 = 0.5, activate_func = nn.ReLU()):
+    def __init__(self, num_inputs, num_outputs, num_hiddens1, num_hiddens2, is_training=True, dropout1 = 0.2, dropout2 = 0.5):
         super(MLP, self).__init__()
         self.num_inputs, self.num_outputs = num_inputs, num_outputs
         self.is_training = is_training
         self.linear1 = nn.Linear(num_inputs, num_hiddens1)
         self.linear2 = nn.Linear(num_hiddens1, num_hiddens2)
         self.linear3 = nn.Linear(num_hiddens2, num_outputs)
-        nn.init.xavier_uniform_(self.linear1.weight, 1)
-        nn.init.xavier_uniform_(self.linear2.weight, 1)
-        nn.init.xavier_uniform_(self.linear3.weight, 1)
         self.dropout1 = nn.Dropout(dropout1)
         self.dropout2 = nn.Dropout(dropout2)
-        self.activate_func = activate_func
         
     def forward(self, X):
-        H1 = self.activate_func(self.linear1(X.reshape(-1, self.num_inputs)))
+        H1 = F.relu(self.linear1(X.reshape(-1, self.num_inputs))) + X
         if self.is_training:
             H1 = self.dropout1(H1)
-        H2 = self.activate_func(self.linear2(H1))
+        H2 = F.relu(self.linear2(H1)) + H1 + X
         if self.is_training:
             H2 = self.dropout2(H2)
         return self.linear3(H2)
@@ -59,16 +56,12 @@ class logmseloss(nn.Module):
 
 def get_net():
     num_inputs = 331
-    num_hiddens1 = 256
-    num_hiddens2 = 256
+    num_hiddens1 = 331
+    num_hiddens2 = 331
     num_outputs = 1
 
     # net = MLP(num_inputs, num_outputs, num_hiddens1, num_hiddens2)
-    net = nn.Sequential(nn.Flatten(),
-                        nn.Linear(num_inputs, num_hiddens1), nn.ReLU(), nn.Dropout(0.2), 
-                        nn.Linear(num_hiddens1, num_hiddens2), nn.ReLU(), nn.Dropout(0.5),
-                        nn.Linear(num_hiddens2, num_outputs))
-    # net = nn.Sequential(nn.Linear(num_inputs, num_outputs))
+    net = MLP(num_inputs,num_outputs, num_hiddens1, num_hiddens2)
     def init_weight(m):
         if type(m) == nn.Linear:
             nn.init.xavier_uniform_(m.weight)
